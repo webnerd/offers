@@ -1,0 +1,9 @@
+{
+    "mongo": {
+        "host": "localhost",
+        "port": 27017
+    },
+    "template": {
+        "path": "F:\\xampp\\htdocs\\demo\\offers\\nodeJs\\"
+    }
+}

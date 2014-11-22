@@ -6,13 +6,18 @@ minify       = require('minify'),
 _            = require('underscore'),
 mongo        = require('mongodb'),
 events       = require('events'),
+config       = require('config'),
 eventEmitter = new events.EventEmitter(),
 MongoClient  = mongo.MongoClient;
-	
 
-var db, server;
-var result = '';
-MongoClient.connect('mongodb://127.0.0.1:27017/products', function(err, dbase) {
+var
+db,
+server,
+result = '',
+mongoConfig = config.get('mongo'),
+templateConfig = config.get('template');
+
+MongoClient.connect('mongodb://127.0.0.1:'+ mongoConfig.port +'/products', function(err, dbase) {
   if (err) throw err;
   console.log("Connected to Database");
   db = dbase;
@@ -91,7 +96,7 @@ var findData = function (collection, data, res)
 	
 
 
-	minify('F:\\Technical\\nodejs\\productTemplate.html',function(err, template) {
+	minify( templateConfig + 'productTemplate.html',function(err, template) {
 		db.collection("product").find(options, function(err, docs) {
 			docs.toArray(function(err, doc) {
 				if(doc)
