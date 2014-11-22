@@ -1,0 +1,20 @@
+<strong><%= name %></strong>
+<ul>
+    <% _.each(brands, function(brand) { %>
+        <li>
+            <strong><%= brand.name %></strong>
+            <strong>Offers</strong>
+            <% _.each(brand.data, function(brandData) { %>
+                    <p class="offerLocation">Location: <%= brandData.location %></p>
+                    <% _.each(brandData.offers, function(offerCategory) { %>
+                        <% _.each(offerCategory, function(offer) { %>
+                            <div class="offerDetails">
+                                <img src='<%= brandData.photo %>' alt='<%= brand.name %>'/>
+                                <strong><%= offer.offer %> <%= offer.type %></strong>
+                            </div>
+                        <% }); %>
+                    <% }); %>
+            <% }); %>
+        </li>
+     <% }); %>
+</ul>
