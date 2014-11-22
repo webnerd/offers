@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-8">
+        <title>Backbone.js Web App</title>
+        <link rel="stylesheet" href="css/screen.css" />
+    </head>
+    <body>
+	
+	<p> <a href="/demo/"> Show All</a> </p>
+		<div id="contacts">
+            <header>
+                <div id="filter"><label>Filter Results By Type::</label></div>
+                <div id="filterByBrand"><label>Filter Results By Brand::</label></div>
+            </header>
+        </div>
+        <script id="contactTemplate" type="text/template">
+            <h1><%= name %>
+            <ul>
+			   <span><%= address %></span>
+			 </ul>
+            </h1>
+        </script>
+        <script src="js/jquery-1.7.1.min.js"></script>
+        <!--script src="js/json2.js"></script-->
+        <!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script-->
+        <script src="js/underscore-min.js"></script>
+        <script src="js/backbone-min.js"></script>
+        <script src="js/my.js"></script>
+    </body>
+</html>
