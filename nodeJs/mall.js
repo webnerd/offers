@@ -17,7 +17,7 @@ result = '',
 mongoConfig = config.get('mongo'),
 templateConfig = config.get('template');
 
-MongoClient.connect('mongodb://127.0.0.1:'+ mongoConfig.port +'/products', function(err, dbase) {
+MongoClient.connect('mongodb://'+ mongoConfig.host+ ':' + mongoConfig.port + '/' + mongoConfig.database, function(err, dbase) {
   if (err) throw err;
   console.log("Connected to Database");
   db = dbase;
@@ -96,7 +96,7 @@ var findData = function (collection, data, res)
 	
 
 
-	minify( templateConfig + 'productTemplate.html',function(err, template) {
+	minify( templateConfig.path + 'productTemplate.html',function(err, template) {
 		db.collection("product").find(options, function(err, docs) {
 			docs.toArray(function(err, doc) {
 				if(doc)
