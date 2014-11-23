@@ -27,7 +27,7 @@
 	// Collection : Group of model/conact
 	var ServerData = Backbone.Collection.extend({
 
-       url : 'http://127.0.0.1:6600/product/find',
+       url : 'http://127.0.0.1:6600/offers/find',
 
        reset : function (model, options) {
 				console.log("Inside event");
@@ -283,7 +283,6 @@
 				contactsRouter.navigate('filter/'+ filterName + '/' + filterType);
 			}
 		},
-		
 	});
 	
     var collection = '';

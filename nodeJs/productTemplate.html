@@ -1,20 +1,12 @@
-<strong><%= name %></strong>
+<strong><%= category %></strong>
 <ul>
-    <% _.each(brands, function(brand) { %>
         <li>
-            <strong><%= brand.name %></strong>
+            <strong><%= brand %></strong>
             <strong>Offers</strong>
-            <% _.each(brand.data, function(brandData) { %>
-                    <p class="offerLocation">Location: <%= brandData.location %></p>
-                    <% _.each(brandData.offers, function(offerCategory) { %>
-                        <% _.each(offerCategory, function(offer) { %>
-                            <div class="offerDetails">
-                                <img src='<%= brandData.photo %>' alt='<%= brand.name %>'/>
-                                <strong><%= offer.offer %> <%= offer.type %></strong>
-                            </div>
-                        <% }); %>
-                    <% }); %>
-            <% }); %>
+                <p class="offerLocation">Location: <%= location.state %></p>
+                <div class="offerDetails">
+                    <img src='<%= offer.photo %>' alt='<%= offer.offer %>'/>
+                    <strong><%= offer.type %> <%= offer.amount %></strong>
+                </div>
         </li>
-     <% }); %>
 </ul>

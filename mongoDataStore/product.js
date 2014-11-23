@@ -242,3 +242,27 @@ db.product.insert({
 		},
 	]
 });
+
+// latest
+
+db.offers.insert(
+	{
+		category:'Jeans',
+		brand:':Lee Cooper',
+		location:{
+			address :'Central Mall',
+			locality: '',
+			city : 'Pune',
+			state: 'MH',
+			pincode : '411007',
+			lat: '',
+			long: ''
+		},
+		offer : {
+			type : '%',
+			tc : '' ,
+			amount: '50',
+			photo:'img/placeholder.png'
+		}
+	}
+);

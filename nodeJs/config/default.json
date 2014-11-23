@@ -2,7 +2,7 @@
     "mongo": {
         "host": "localhost",
         "port": 27017,
-		"database" : "offers"
+		"database" : "world"
     },
     "template": {
         "path": "F:\\xampp\\htdocs\\demo\\offers\\nodeJs\\"
