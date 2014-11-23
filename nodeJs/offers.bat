@@ -1,5 +1,5 @@
 @echo off
-TITLE 
+TITLE mongodb
 start mongod --journal
-TITLE temp_pass.py
+TITLE mall.js
 start nodemon "F:\xampp\htdocs\demo\offers\nodeJs\mall.js"
