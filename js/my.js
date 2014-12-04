@@ -159,14 +159,15 @@
 			directory.$el.append(contactView.render().el);
 		},
 		getTypes: function() {
-		console.log('getTypes');
-		var data = directory.collection.pluck("name");
+			console.log('getTypes');
+			var data = directory.collection.pluck("category");
 		    return _.uniq(data);
 		},
 		
         getBrands: function() {
 		console.log('getTypes');
-		var data = directory.collection.models;
+		/*
+		    var data = directory.collection.models;
 		    
             var finalData = new Array();
 		    _.each(data, function(item1){
@@ -177,6 +178,9 @@
 		        });
 		    });
 		    return _.uniq(finalData);
+		*/
+			var data = directory.collection.pluck("brand");
+		    return _.uniq(data);
 		},
 
 		createSelectForType: function (){
@@ -243,15 +247,16 @@
 			    directory.collection.reset(contacts, { silent: true });	
 				if (filterName == 'type')
 				{
-					var filtered = _.filter(this.collection.models, function(item){
-							return item.get("name").toLowerCase() == filterType.toLowerCase();
-					});
+					var filtered  = this.collection.models.where({category : filterType.toLowerCase()});
+					/*var filtered = _.filter(this.collection.models, function(item){
+							return item.get("category").toLowerCase() == filterType.toLowerCase();
+					});*/
 				}
 				else if (filterName == 'brand')
 				{
 					
 
-                    var filtered = _.filter(this.collection.models, function(brands){
+                    /*var filtered = _.filter(this.collection.models, function(brands){
 						 
 							var f = _.filter(brands.get('brands'), function(item){
 								return item.name.toLowerCase() == filterType.toLowerCase();
@@ -261,6 +266,9 @@
 							{
 								return true;
 							}
+					});*/
+					var filtered = _.filter(this.collection.models, function(item){
+							return item.get("brand").toLowerCase() == filterType.toLowerCase();
 					});
 				}
 				else if (filterName == 'discount')
@@ -280,7 +288,7 @@
 					});
 				}
 				this.collection.reset(filtered);
-				contactsRouter.navigate('filter/'+ filterName + '/' + filterType);
+				//contactsRouter.navigate('filter/'+ filterName + '/' + filterType);
 			}
 		},
 	});
@@ -296,15 +304,14 @@
 			"filter/:name/:type" : "urlFilter",
 			'*path':  'urlFilter'
 		},
-		urlFilter: function(name, type){
+		urlFilter: function(querystring){
 		    console.log('urlFilter');
-		    filterType = type;
-		    filterName = name;
+			console.log(querystring);
 			directory = new DirectoryView();
 		}
 	});
 	
-	var contactsRouter = new ContactsRouter();
+	var contactsRouter = new ContactsRouter;
 	//create instance of master view
    	Backbone.history.start();
 

@@ -70,7 +70,38 @@ perform = function (operation, collection, data, res)
 		updateData(collection, data, res);
 	}
 };
-	
+
+var addData = function (collection, data, res)
+{
+	//simple json record
+	var document = {
+		category:'shirt',
+		brand:'Levis',
+		location:{
+			address :'Phoenix',
+			locality: '',
+			city : 'Pune',
+			state: 'MH',
+			pincode : '411007',
+			lat: '',
+			long: ''
+		},
+		offer : {
+			type : '%',
+			tc : '' ,
+			amount: '40',
+			photo:'img/placeholder.png'
+		}
+	};
+
+	console.log(JSON.stringify(document));
+	db.collection(collection).insert(document, function(err, records) {
+		if (err) throw err;
+		res.write(JSON.stringify(records));
+		res.end('\n');
+	});
+}
+
 var findData = function (collection, data, res)
 {
 	console.log(data);
@@ -97,7 +128,7 @@ var findData = function (collection, data, res)
 
 console.log(JSON.stringify(options));
 	minify( templateConfig.path + 'productTemplate.html',function(err, template) {
-		db.collection("offers").find(options, function(err, docs) {
+		db.collection(collection).find(options, function(err, docs) {
 			docs.toArray(function(err, doc) {
 				if(doc)
 				{
