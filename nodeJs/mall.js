@@ -33,10 +33,6 @@ MongoClient.connect('mongodb://' + mongoConfig.host + ':' + mongoConfig.port + '
 			pathname.split('/'),
 			function(data){ return data != ''; }
 		);
-	/*	_.each(paths,function(e, index, list){
-			console.log(e);
-		});
-		*/
 		if (paths.length != 2)
 		{
 			res.end();
@@ -51,64 +47,35 @@ MongoClient.connect('mongodb://' + mongoConfig.host + ':' + mongoConfig.port + '
 perform = function (operation, collection, data, res)
 {
 	console.log(operation + ',' + collection + ',' + JSON.stringify(data));
-	//operation(collection, data);
-	//eventEmitter.emit(operation, collection, data, res);
-	if (operation == 'add')
-	{
-		addData(collection, data, res);
-	}
-	if (operation == 'find')
-	{
-		findData(collection, data, res);
-	}
-	if (operation == 'delete')
-	{
-		deleteData(collection, data, res);
-	}
-	if (operation == 'update')
-	{
-		updateData(collection, data, res);
-	}
+	eventEmitter.emit(operation, collection, data, res);
 };
 
-var addData = function (collection, data, res)
+eventEmitter.on('add', function (collection, data, res)
 {
-	//simple json record
-	var document = {
-		category:'shirt',
-		brand:'Levis',
-		location:{
-			address :'Phoenix',
-			locality: '',
-			city : 'Pune',
-			state: 'MH',
-			pincode : '411007',
-			lat: '',
-			long: ''
-		},
-		offer : {
-			type : '%',
-			tc : '' ,
-			amount: '40',
-			photo:'img/placeholder.png'
-		}
+	var document = 
+	{
+		"category": data.category,
+		"brand"   : data.brand,
+		location  : {"address" :data.address,"locality": data.locality,"city" : data.city,	"state": data.state,"pincode" : data.pincode},
+		offer     : {"type" : data.type,"tc" : data.tc,"amount": data.amount,"photo":'img/placeholder.png'},
+		"active"  : 0
 	};
 
-	console.log(JSON.stringify(document));
 	db.collection(collection).insert(document, function(err, records) {
 		if (err) throw err;
 		res.write(JSON.stringify(records));
 		res.end('\n');
 	});
-}
+});
 
-var findData = function (collection, data, res)
+eventEmitter.on('find',function (collection, data, res)
 {
 	console.log(data);
+
+	var options = {'active' : 0};
+
+	/*
 	if (data.name == 'all' || data.name == '') data = '';
-
-	var options = {};
-
     if (data.hasOwnProperty('filterBrand'))
     {
         options = {'brands.name' : data.filterBrand};
@@ -124,7 +91,7 @@ var findData = function (collection, data, res)
     	options = {'brands.offer' : {$gte : data.filterDiscount * 10, $lte : (data.filterDiscount * 10) + 10}};
     	if (data.filterDiscount  == 'all' || data.filterDiscount  == '') options = '';
     }
-	
+	*/
 
 console.log(JSON.stringify(options));
 	minify( templateConfig.path + 'productTemplate.html',function(err, template) {
@@ -169,4 +136,4 @@ console.log(JSON.stringify(options));
 	//var template = fs.readFileSync('./productTemplate.html', "utf8");
 		
 //	res.end(result);
-}
+});

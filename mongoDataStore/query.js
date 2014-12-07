@@ -36,9 +36,10 @@ db.product.update(
 
 db.product.update(
     { name: "Jeans" },
-    { $push: {
-        brands: { name : 'Jai Hind', offer : 22, photo : 'img/placeholder.png' }
-      }
+    { $push:
+		{
+			brands: { name : 'Jai Hind', offer : 22, photo : 'img/placeholder.png' }
+        }
 	}
 )
 

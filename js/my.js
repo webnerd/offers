@@ -1,17 +1,5 @@
 (function ($) {
 
-    //demo data
-   /* var contacts = [
-        { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-        { name: "Contact 2", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-        { name: "Contact 3", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-        { name: "Contact 4", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "colleague" },
-        { name: "Contact 5", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-        { name: "Contact 6", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "colleague" },
-        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-        { name: "Contact 8", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" }
-    ];
-	*/
 	// MOdel: Single contact
 	var Contact = Backbone.Model.extend({
 		defaults: {
@@ -78,22 +66,23 @@
 			return this;
 		},
 	});
-	
- 	
+
 	var DirectoryView = Backbone.View.extend({
 	
 		el: $("#contacts"),
 		filterType : '',
 		filterName : '',
-		
+		events: {
+			"change #filters select": "setFilter",
+		},
 		initialize: function(){
 			console.log('initialize');
 
 			var sd = new ServerData();
 			var collection = '';
 
-			filterType = filterType || 'all';
-			filterName = filterName || 'brand';
+			//filterType = filterType || 'all';
+			//filterName = filterName || 'brand';
 
 			var options = {};
 
@@ -115,25 +104,23 @@
 				success: function(response,xhr) {
 					console.log("Inside success");
 					console.log(response);
-					contacts = response.models;
-					directory.collection =  new Directory(contacts);
+					directory.collection         =  new Directory(response.models);
+					directory.collectionToFilter = directory.collection.clone();
 
-					directory.$el.find('#filter').append(directory.createSelectForType());
-					directory.$el.find('#filter').append(directory.createSelectForBrand());
+					directory.$el.find('header').append(directory.createSelectForType());
+					directory.$el.find('header').append(directory.createSelectForBrand());
 
-					var discountFilter = '<div id="filterByDiscount"><label>Filter Results By Discount ::</label><select id="filterBox" name="discount"><option value="1">0-10%</option><option value="2">11-20%</option><option value="3">21-30%</option><option value="4">31-40%</option><option value="5">41-50%</option></select></div>';
-					directory.$el.find('#filter').append(discountFilter);
-					directory.render();
-                    directory.on('change:filterType', directory.filterByType, directory);
+                    directory.on('change:filterByType', directory.filterByType, directory);
+
 					directory.collection.on("reset", directory.render, directory);	
-					if (filterType && filterType !='all')
+					if (directory.filters)
 					{
-						directory.trigger('change:filterType');
-						//directory.filterByType();
+						directory.trigger('change:filterByType');
 					}
-
-					//directory.$el.find('#filter').append(directory.createSelect());
-					
+					else
+					{
+						directory.render();
+					}
 				},
 				error: function (errorResponse) {
 					console.log("Inside error");
@@ -145,7 +132,6 @@
 		render : function(){
 		console.log('DirectoryView:render');
 			directory.$el.find("div.contact-container").remove();
-			
 			_.each(directory.collection.models, function(item){
 				directory.renderContact(item);
 			}, directory)
@@ -160,34 +146,19 @@
 		},
 		getTypes: function() {
 			console.log('getTypes');
-			var data = directory.collection.pluck("category");
-		    return _.uniq(data);
+		    return _.uniq(directory.collection.pluck("category"));
 		},
 		
         getBrands: function() {
 		console.log('getTypes');
-		/*
-		    var data = directory.collection.models;
-		    
-            var finalData = new Array();
-		    _.each(data, function(item1){
-                
-                var item = item1.toJSON();
-                _.each(item.brands, function(brand){
-                      finalData.push(brand.name);
-		        });
-		    });
-		    return _.uniq(finalData);
-		*/
-			var data = directory.collection.pluck("brand");
-		    return _.uniq(data);
+		    return _.uniq(directory.collection.pluck("brand"));
 		},
 
 		createSelectForType: function (){
 		console.log('createSelect');
-		$('#filterBox').remove();
-		    var select = $("<select/>", {
-					html: "<option value=''>All</option>",	
+		$('#filterByType').remove();
+		    var selectType = $("<select/>", {
+					html: "<option value='all'>All</option>",	
 				});
 				var types = this.getTypes();
 
@@ -195,119 +166,82 @@
 				var option = $("<option/>", {
 					value: item,
 					text: item,
-				}).appendTo(select);
+					selected : (directory.filters && directory.filters.category == item) ? true : false,
+				}).appendTo(selectType);
 			});
-			select.attr('id', 'filterBox');
-			select.attr('name', 'type');
-			return select;
+			selectType.attr('id', 'filterByType');
+			selectType.attr('class', 'filters');
+			selectType.attr('name', 'category');
+			return selectType;
 		},
 		
 		createSelectForBrand : function(){
 
 			$('#filterByBrand').remove();
 			var brands = this.getBrands();
-
-            var selectBrands = $("<select/>", {
-					html: "<option value=''>All</option>",	
+            var selectBrand = $("<select/>", {
+					html: "<option value='all'>All</option>",	
             });
 
 			_.each(brands, function(item){
 				var option = $("<option/>", {
 					value: item,
 					text: item,
-				}).appendTo(selectBrands);
+					selected : (directory.filters && directory.filters.brand == item) ? true : false,
+				}).appendTo(selectBrand);
 			});
-			selectBrands.attr('id', 'filterBoxBrands');
-			selectBrands.attr('name', 'brand');
-			return selectBrands;
+			selectBrand.attr('id', 'filterByBrands');
+			selectBrand.attr('class', 'filters');
+			selectBrand.attr('name', 'brand');
+			return selectBrand;
 		},
 
-		events: {
-			"change #filter select": "setFilter",
-		},
-		
 		setFilter: function(e) {
-		console.log('setFilter');
-			filterType = e.currentTarget.value;
-			filterName = e.currentTarget.name;
-			this.trigger('change:filterType');
+			console.log('setFilter');
+			this.trigger('change:filterByType');
 		},
 		
 		filterByType: function(){
 			console.log('filterByType');
-			if(filterType == 'all' || filterType == '')
+			var filterOptions = {};
+			
+			if (!directory.filters)
 			{
-				this.collection.reset(contacts);
-				//this.collection.reset(contacts, {silent: true });
-				contactsRouter.navigate('filter/' + filterName + '/all');
+				_.each($('.filters'), function(filter){
+					if (filter.value.toLowerCase() !='' && filter.value.toLowerCase() !='all')
+						filterOptions[filter.name] = filter.value.toLowerCase();
+				});
 			}
 			else
 			{
-			
-			    directory.collection.reset(contacts, { silent: true });	
-				if (filterName == 'type')
-				{
-					var filtered  = this.collection.models.where({category : filterType.toLowerCase()});
-					/*var filtered = _.filter(this.collection.models, function(item){
-							return item.get("category").toLowerCase() == filterType.toLowerCase();
-					});*/
-				}
-				else if (filterName == 'brand')
-				{
-					
-
-                    /*var filtered = _.filter(this.collection.models, function(brands){
-						 
-							var f = _.filter(brands.get('brands'), function(item){
-								return item.name.toLowerCase() == filterType.toLowerCase();
-							});
-
-							if (f.length)
-							{
-								return true;
-							}
-					});*/
-					var filtered = _.filter(this.collection.models, function(item){
-							return item.get("brand").toLowerCase() == filterType.toLowerCase();
-					});
-				}
-				else if (filterName == 'discount')
-				{
-					
-
-                    var filtered = _.filter(this.collection.models, function(brands){
-						 
-							var f = _.filter(brands.get('brands'), function(item){
-								return item.offer >= filterType * 10 && item.offer <= (filterType * 10) + 10;
-							});
-
-							if (f.length)
-							{
-								return true;
-							}
-					});
-				}
-				this.collection.reset(filtered);
-				//contactsRouter.navigate('filter/'+ filterName + '/' + filterType);
+				filterOptions = directory.filters;
 			}
+
+			if (!_.isEmpty(filterOptions))
+			{
+				var filtered = this.collectionToFilter.where(filterOptions);
+			}
+			else
+			{
+				var filtered = this.collectionToFilter.models;
+			}
+			directory.filters = '';
+			this.collection.reset(filtered);
+			contactsRouter.navigate('filter/' + JSON.stringify(filterOptions));
 		},
 	});
-	
-    var collection = '';
-	var contacts   = '';
- 	var filterType = '';
- 	var filterName = '';
- 	var directory  = '';
 
+	
 	var ContactsRouter = Backbone.Router.extend({
 		routes: {
-			"filter/:name/:type" : "urlFilter",
+			"filter/:filters" : "urlFilter",
 			'*path':  'urlFilter'
 		},
-		urlFilter: function(querystring){
+		urlFilter: function(filters){
 		    console.log('urlFilter');
-			console.log(querystring);
+			console.log(filters);
 			directory = new DirectoryView();
+			directory.filters = JSON.parse(filters);
 		}
 	});
 	
