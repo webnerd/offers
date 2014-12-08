@@ -68,11 +68,42 @@ eventEmitter.on('add', function (collection, data, res)
 	});
 });
 
-eventEmitter.on('find',function (collection, data, res)
+eventEmitter.on('getNewlyAddedOffers',function (collection, data, res)
 {
 	console.log(data);
 
 	var options = {'active' : 0};
+
+	minify( templateConfig.path + 'newlyAddedOffer.html',function(err, template) {
+		db.collection(collection).find(options, function(err, docs) {
+			docs.toArray(function(err, doc) {
+				if(doc)
+				{
+					res.writeHead(200, {'Content-Type': 'application/json'});
+
+					var responseData = {};
+					responseData.data = doc;
+					responseData.template = template;
+					res.write(JSON.stringify(responseData));
+
+					res.end('\n');
+				}
+				else
+				{
+					console.log(err);
+					res.end();
+				}
+			});
+		});
+	});
+	
+});
+
+eventEmitter.on('find',function (collection, data, res)
+{
+	console.log(data);
+
+	var options = {'active' : 1};
 
 	/*
 	if (data.name == 'all' || data.name == '') data = '';

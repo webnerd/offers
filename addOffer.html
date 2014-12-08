@@ -137,15 +137,7 @@ $(".previous").click(function(){
 
 $(".submit").click(function(){
 	$("#msform").ajaxForm(function(data){
-		/*var objImg = jQuery.parseJSON(data);
-		if(objImg.error){
-			$('.errorImage'+key).html(objImg.errorMsg);
-			$('.errorImage'+key).attr('style','color:red;');
-			$('#img_preview'+key).html('No file chosen');
-		}else{
-			$('#newImage').replaceWith(objImg.thumb);
-		}*/
-		window.location.href = 'http://localhost/demo/offers/addoffer.html';
+		window.location.href = 'http://localhost/offers/addoffer.html';
 	}).submit();
 })
 
