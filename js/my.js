@@ -220,6 +220,7 @@
 			if (!_.isEmpty(filterOptions))
 			{
 				var filtered = this.collectionToFilter.where(filterOptions);
+				contactsRouter.navigate('filter/' + JSON.stringify(filterOptions));
 			}
 			else
 			{
@@ -227,26 +228,27 @@
 			}
 			directory.filters = '';
 			this.collection.reset(filtered);
-			contactsRouter.navigate('filter/' + JSON.stringify(filterOptions));
+			
+			
 		},
 	});
 
-	
 	var ContactsRouter = Backbone.Router.extend({
 		routes: {
 			"filter/:filters" : "urlFilter",
-			'*path':  'urlFilter'
+			//'*path':  'urlFilter'
 		},
 		urlFilter: function(filters){
 		    console.log('urlFilter');
 			console.log(filters);
-			directory = new DirectoryView();
 			directory.filters = JSON.parse(filters);
 		}
 	});
 	
-	var contactsRouter = new ContactsRouter;
 	//create instance of master view
+	var directory      = new DirectoryView;
+	var contactsRouter = new ContactsRouter;
+
    	Backbone.history.start();
 
 }(jQuery));
