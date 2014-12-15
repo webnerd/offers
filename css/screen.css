@@ -19,11 +19,11 @@ a { color:orange;}
 html {
 	height: 100%;
 	/*Image only BG fallback*/
-	background: url('/demo/offers/img/gs.png');
+	background: url('/img/gs.png');
 	/*background = gradient + image pattern combo*/
 	background: 
 		linear-gradient(rgba(196, 102, 0, 0.2), rgba(155, 89, 182, 0.2)), 
-		url('/demo/offers/img/gs.png');
+		url('/img/gs.png');
 }
 
 body {
@@ -143,7 +143,7 @@ body {
 	background: #27AE60;
 	color: white;
 }
-
+.green{color:green;}
 
 
 

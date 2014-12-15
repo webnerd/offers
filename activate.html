@@ -29,18 +29,24 @@
         model: Contact
     });
 
-	// Collection : Group of model/conact
+	// Collection : Group of model/contact
 	var ServerData = Backbone.Collection.extend({
 
-       url : 'http://127.0.0.1:6600/offers/getNewlyAddedOffers',
+		urlPrifix : 'http://127.0.0.1:6600/offers/',
+		
+		initialize: function(props){
+			this.instanceUrl =  this.urlPrifix + props.url;
+		},
+        url : function(){ return this.instanceUrl;},
 
-       reset : function (model, options) {
+		setUrlSuffix : function (suffix) { this.instanceUrl =  this.urlPrifix + suffix;},
+        reset : function (model, options) {
 				console.log("Inside event");
 				console.log(model);
-	   },
+	    },
 		//Parse the response
 		parse: function (response) {
-			
+
 			console.log("Inside Parse");
 			
 			//keys
@@ -70,12 +76,24 @@
 		tagName: "div",
 		className: "contact-container",
 		//template: $("#contactTemplate").html(),
+		events: {
+			"click [type='checkbox']": "clicked",
+		},
 		
+		clicked: function (event) {
+			console.log(event.target.name);
+			var template = this.model.get('template');
+			this.model.unset('template');
+			this.model.collection.setUrlSuffix('updateOffers');
+			this.model.save({active : 1});
+			this.model.set({template : template});
+			this.render();
+		},
 		render: function(){
-		console.log('ContactView:render');
+		    console.log('ContactView:render');
 			var tmpl = _.template(this.model.get('template'));
 			//var tmpl = _.template(this.template);
-			
+			console.log(this.model.toJSON());
 			$(this.el).html(tmpl(this.model.toJSON()));
 			return this;
 		},
@@ -91,8 +109,10 @@
 		},
 		initialize: function(){
 			console.log('initialize');
+			
+			var sdOptions = {url : 'getNewlyAddedOffers'}
 
-			var sd = new ServerData();
+			var sd = new ServerData(sdOptions);
 			var collection = '';
 			var options = {};
 
@@ -102,15 +122,7 @@
 					console.log("Inside success");
 					console.log(response);
 					directory.collection         =  new Directory(response.models);
-					/*directory.collectionToFilter = directory.collection.clone();
 
-					directory.$el.find('header').append(directory.createSelectForType());
-					directory.$el.find('header').append(directory.createSelectForBrand
-					
-
-                    directory.on('change:filterByType', directory.filterByType, directory);
-
-					directory.collection.on("reset", directory.render, directory);	*/
 					if (directory.filters)
 					{
 						directory.trigger('change:filterByType');
@@ -248,6 +260,8 @@
 	var contactsRouter = new ContactsRouter;
 
    	Backbone.history.start();
+	Backbone.emulateHTTP = true;
+Backbone.emulateJSON = true;
 
 }(jQuery));
 		

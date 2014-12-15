@@ -1,7 +1,16 @@
-<div>
-<span class="padding-5"><%= category %></span>
-<span class="padding-5"><%= brand %></span>
-<span class="padding-5"><%= location.state %></span>
-<span class="padding-5"><%= offer.type %> <%= offer.amount %></span>
-<span class="padding-5"> <input type="checkbox" name="<%= _id %>" value="<%= _id %>"> </span>
+<% 
+if(active === 1) {
+	print('<div class="green">');
+} 
+else
+{
+	print('<div>');
+}
+%>
+	<span class="padding-5"><%= category %></span>
+	<span class="padding-5"><%= brand %></span>
+	<span class="padding-5">Active : <%= active %></span>
+	<span class="padding-5"><%= location.state %></span>
+	<span class="padding-5"><%= offer.type %> <%= offer.amount %></span>
+	<span class="padding-5"> <input type="checkbox" name="<%= _id %>" value="<%= _id %>"> </span>
 </div>

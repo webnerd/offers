@@ -109,7 +109,7 @@
 
 					directory.$el.find('header').append(directory.createSelectForType());
 					directory.$el.find('header').append(directory.createSelectForBrand());
-
+					
                     directory.on('change:filterByType', directory.filterByType, directory);
 
 					directory.collection.on("reset", directory.render, directory);	
@@ -177,7 +177,7 @@
 		
 		createSelectForBrand : function(){
 
-			$('#filterByBrand').remove();
+			$('#filterByBrands').remove();
 			var brands = this.getBrands();
             var selectBrand = $("<select/>", {
 					html: "<option value='all'>All</option>",	
@@ -208,8 +208,8 @@
 			if (!directory.filters)
 			{
 				_.each($('.filters'), function(filter){
-					if (filter.value.toLowerCase() !='' && filter.value.toLowerCase() !='all')
-						filterOptions[filter.name] = filter.value.toLowerCase();
+					if (filter.value !='' && filter.value.toLowerCase() !='all')
+						filterOptions[filter.name] = filter.value;
 				});
 			}
 			else
@@ -226,10 +226,10 @@
 			{
 				var filtered = this.collectionToFilter.models;
 			}
-			directory.filters = '';
+
 			this.collection.reset(filtered);
-			
-			
+			directory.$el.find('header').append(directory.createSelectForBrand());
+			directory.filters = '';
 		},
 	});
 

@@ -7,6 +7,7 @@ _            = require('underscore'),
 mongo        = require('mongodb'),
 events       = require('events'),
 config       = require('config'),
+qs           = require('querystring');
 eventEmitter = new events.EventEmitter(),
 MongoClient  = mongo.MongoClient;
 
@@ -15,6 +16,7 @@ db,
 server,
 result = '',
 mongoConfig = config.get('mongo'),
+mongoObjectId = mongo.ObjectID,
 templateConfig = config.get('template');
 
 MongoClient.connect('mongodb://' + mongoConfig.host + ':' + mongoConfig.port + '/' + mongoConfig.database, function(err, dbase) {
@@ -28,19 +30,40 @@ MongoClient.connect('mongodb://' + mongoConfig.host + ':' + mongoConfig.port + '
     	res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
 		var parsedUrl = url.parse(req.url, true);
-		pathname = parsedUrl.pathname;
+		var pathname = parsedUrl.pathname;
 		var paths = _.filter(
 			pathname.split('/'),
 			function(data){ return data != ''; }
 		);
-		if (paths.length != 2)
+			
+		if (req.method == 'GET')
+		{
+			
+			if (paths.length != 2)
+			{
+				res.end();
+			}
+			else
+			{   
+				perform(paths[1], paths[0], parsedUrl.query, res);
+			}
+		}
+		else if (req.method == 'POST')
+		{
+			var jsonString = '';
+            req.on('data', function (data) {
+                jsonString += data;
+            });
+            req.on('end', function () {
+				jsonString = qs.parse(jsonString);			    
+				perform(paths[1], paths[0], JSON.parse(jsonString.model), res);
+            });
+		}
+		else
 		{
 			res.end();
 		}
-		else
-		{   
-			perform(paths[1], paths[0], parsedUrl.query, res);
-		}
+		
 	});
 	server.listen(6600, '127.0.0.1');
 });
@@ -66,6 +89,23 @@ eventEmitter.on('add', function (collection, data, res)
 		res.write(JSON.stringify(records));
 		res.end('\n');
 	});
+});
+
+eventEmitter.on('updateOffers',function (collection, data, res)
+{
+	var criteria = {_id : new mongoObjectId(data._id) };
+	var updatedData = data;
+	delete updatedData._id;
+
+	db.collection(collection).update(criteria, updatedData, {multi : false}, function(err, count, objData) {
+		var status = {error : false, message : 'Update Successful'};
+		if (err)
+		{
+			status = {error : true, message : 'Update Failed'};
+		}
+		res.writeHead(200, {'Content-Type': 'application/json'});
+		res.end(JSON.stringify(status));
+	});	
 });
 
 eventEmitter.on('getNewlyAddedOffers',function (collection, data, res)
