@@ -1,0 +1,4 @@
+http://techcrunch.com/gallery/a-dozen-apps-for-finding-the-best-local-deals/
+http://localdealsites.com/
+
+cordova plugin add org.apache.cordova.geolocation

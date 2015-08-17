@@ -1,5 +1,5 @@
 @echo off
 TITLE mongodb
-start mongod --journal
+start mongod 
 TITLE mall.js
 start nodemon "F:\Technical\xampp\htdocs\offers\nodeJs\mall.js"
