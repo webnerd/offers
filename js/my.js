@@ -1,26 +1,26 @@
 (function ($) {
 
 	// MOdel: Single contact
-	var Contact = Backbone.Model.extend({
+	var Deal = Backbone.Model.extend({
 		defaults: {
 			photo: "img/placeholder.png",
 		},
 	});
 	
-	 //define directory collection
-    var Directory = Backbone.Collection.extend({
-        model: Contact
-    });
+	 //define dealGroup collection
+    var DealGroup = Backbone.Collection.extend({
+        model: Deal,
+    //});
 
-	// Collection : Group of model/conact
-	var ServerData = Backbone.Collection.extend({
+	// Collection : Group of model/Deals
+	//var ServerData = Backbone.Collection.extend({
 
-       url : 'http://127.0.0.1:6600/offers/find',
-
-       reset : function (model, options) {
-				console.log("Inside event");
-				console.log(model);
-	   },
+        url : 'http://127.0.0.1:6600/offers/find',
+		sync: function(method, collection, options) {
+		   options.dataType = "jsonp";
+		   options.jsonpCallback = "jsonpCallback";
+		   return Backbone.sync(method, collection, options);
+		 },
 		//Parse the response
 		parse: function (response) {
 			
@@ -36,12 +36,12 @@
 			for (var i = 0, length = values.length; i < length; i++) {
 				
 				var currentValues = values[i];
-				var productObject = {};
+				var dealObject = {};
 				
-				productObject = values[i];
-				productObject['template'] = template;
+				dealObject = values[i];
+				dealObject['template'] = template;
 
-				this.models.push(productObject);	
+				this.models.push(dealObject);	
 			}
 			
 			console.log(this.models);
@@ -52,13 +52,13 @@
 	});
 	
 	// 1:1 view
-	var ContactView = Backbone.View.extend({
+	var DealView = Backbone.View.extend({
 		tagName: "div",
 		className: "contact-container",
 		//template: $("#contactTemplate").html(),
 		
 		render: function(){
-		console.log('ContactView:render');
+		console.log('DealView:render');
 			var tmpl = _.template(this.model.get('template'));
 			//var tmpl = _.template(this.template);
 			
@@ -67,7 +67,7 @@
 		},
 	});
 
-	var DirectoryView = Backbone.View.extend({
+	var DealGroupView = Backbone.View.extend({
 	
 		el: $("#contacts"),
 		filterType : '',
@@ -78,13 +78,14 @@
 		initialize: function(){
 			console.log('initialize');
 
-			var sd = new ServerData();
+			var dg = new DealGroup();
 			var collection = '';
 
 			//filterType = filterType || 'all';
 			//filterName = filterName || 'brand';
 
 			var options = {};
+			options.dataType = "jsonp";
 
 			/*if (filterName == 'type')
 			{
@@ -99,27 +100,27 @@
 				options = {filterDiscount : filterType};
 			}
 			*/
-			sd.fetch({
+			dg.fetch({
 				data: options,
 				success: function(response,xhr) {
 					console.log("Inside success");
 					console.log(response);
-					directory.collection         =  new Directory(response.models);
-					directory.collectionToFilter = directory.collection.clone();
+					dealGroup.collection         =  new DealGroup(response.models);
+					dealGroup.collectionToFilter = dealGroup.collection.clone();
 
-					directory.$el.find('header').append(directory.createSelectForType());
-					directory.$el.find('header').append(directory.createSelectForBrand());
+					dealGroup.$el.find('header').append(dealGroup.createSelectForType());
+					dealGroup.$el.find('header').append(dealGroup.createSelectForBrand());
 					
-                    directory.on('change:filterByType', directory.filterByType, directory);
+                    dealGroup.on('change:filterByType', dealGroup.filterByType, dealGroup);
 
-					directory.collection.on("reset", directory.render, directory);	
-					if (directory.filters)
+					dealGroup.collection.on("reset", dealGroup.render, dealGroup);	
+					if (dealGroup.filters)
 					{
-						directory.trigger('change:filterByType');
+						dealGroup.trigger('change:filterByType');
 					}
 					else
 					{
-						directory.render();
+						dealGroup.render();
 					}
 				},
 				error: function (errorResponse) {
@@ -131,27 +132,27 @@
 		
 		render : function(){
 		console.log('DirectoryView:render');
-			directory.$el.find("div.contact-container").remove();
-			_.each(directory.collection.models, function(item){
-				directory.renderContact(item);
-			}, directory)
+			dealGroup.$el.find("div.contact-container").remove();
+			_.each(dealGroup.collection.models, function(item){
+				dealGroup.renderDeal(item);
+			}, dealGroup)
 		},
 		
-		renderContact: function(item){
-		console.log('renderContact');
-			var contactView = new ContactView({
+		renderDeal: function(item){
+		console.log('renderDeal');
+			var contactView = new DealView({
 				model: item
 			});
-			directory.$el.append(contactView.render().el);
+			dealGroup.$el.append(contactView.render().el);
 		},
 		getTypes: function() {
 			console.log('getTypes');
-		    return _.uniq(directory.collection.pluck("category"));
+		    return _.uniq(dealGroup.collection.pluck("category"));
 		},
 		
         getBrands: function() {
 		console.log('getTypes');
-		    return _.uniq(directory.collection.pluck("brand"));
+		    return _.uniq(dealGroup.collection.pluck("brand"));
 		},
 
 		createSelectForType: function (){
@@ -166,7 +167,7 @@
 				var option = $("<option/>", {
 					value: item,
 					text: item,
-					selected : (directory.filters && directory.filters.category == item) ? true : false,
+					selected : (dealGroup.filters && dealGroup.filters.category == item) ? true : false,
 				}).appendTo(selectType);
 			});
 			selectType.attr('id', 'filterByType');
@@ -187,7 +188,7 @@
 				var option = $("<option/>", {
 					value: item,
 					text: item,
-					selected : (directory.filters && directory.filters.brand == item) ? true : false,
+					selected : (dealGroup.filters && dealGroup.filters.brand == item) ? true : false,
 				}).appendTo(selectBrand);
 			});
 			selectBrand.attr('id', 'filterByBrands');
@@ -205,7 +206,7 @@
 			console.log('filterByType');
 			var filterOptions = {};
 			
-			if (!directory.filters)
+			if (!dealGroup.filters)
 			{
 				_.each($('.filters'), function(filter){
 					if (filter.value !='' && filter.value.toLowerCase() !='all')
@@ -214,7 +215,7 @@
 			}
 			else
 			{
-				filterOptions = directory.filters;
+				filterOptions = dealGroup.filters;
 			}
 
 			if (!_.isEmpty(filterOptions))
@@ -228,12 +229,12 @@
 			}
 
 			this.collection.reset(filtered);
-			directory.$el.find('header').append(directory.createSelectForBrand());
-			directory.filters = '';
+			dealGroup.$el.find('header').append(dealGroup.createSelectForBrand());
+			dealGroup.filters = '';
 		},
 	});
 
-	var ContactsRouter = Backbone.Router.extend({
+	var DealsRouter = Backbone.Router.extend({
 		routes: {
 			"filter/:filters" : "urlFilter",
 			//'*path':  'urlFilter'
@@ -241,13 +242,13 @@
 		urlFilter: function(filters){
 		    console.log('urlFilter');
 			console.log(filters);
-			directory.filters = JSON.parse(filters);
+			dealGroup.filters = JSON.parse(filters);
 		}
 	});
 	
 	//create instance of master view
-	var directory      = new DirectoryView;
-	var contactsRouter = new ContactsRouter;
+	var dealGroup      = new DealGroupView;
+	var contactsRouter = new DealsRouter;
 
    	Backbone.history.start();
 
