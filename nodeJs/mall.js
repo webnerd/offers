@@ -45,7 +45,7 @@ MongoClient.connect('mongodb://' + mongoConfig.host + ':' + mongoConfig.port + '
 			}
 			else
 			{   
-				perform(paths[1], paths[0], parsedUrl.query, res);
+				perform(paths[1], paths[0], parsedUrl.query, res, req);
 			}
 		}
 		else if (req.method == 'POST')
@@ -65,12 +65,12 @@ MongoClient.connect('mongodb://' + mongoConfig.host + ':' + mongoConfig.port + '
 		}
 		
 	});
-	server.listen(6600, '127.0.0.1');
+	server.listen(6600, '192.168.2.9');
 });
-perform = function (operation, collection, data, res)
+perform = function (operation, collection, data, res, req)
 {
 	console.log(operation + ',' + collection + ',' + JSON.stringify(data));
-	eventEmitter.emit(operation, collection, data, res);
+	eventEmitter.emit(operation, collection, data, res, req);
 };
 
 eventEmitter.on('add', function (collection, data, res)
@@ -139,7 +139,7 @@ eventEmitter.on('getNewlyAddedOffers',function (collection, data, res)
 	
 });
 
-eventEmitter.on('find',function (collection, data, res)
+eventEmitter.on('find',function (collection, data, res, req)
 {
 	console.log(data);
 
@@ -175,7 +175,7 @@ console.log(JSON.stringify(options));
 					var responseData = {};
 					responseData.data = doc;
 					responseData.template = template;
-					res.write(JSON.stringify(responseData));
+					res.write(data.callback + '('+ JSON.stringify(responseData)+ ');');
 
 					res.end('\n');
 				}
